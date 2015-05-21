@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <title>My app</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="app/assets/app.css"/>
+    <link rel="stylesheet" href="app/assets/animate.css"/>
+    <link rel="stylesheet" href="app/vendor/angular-material/angular-material.min.css">
+
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
+</head>
+<body ng-app="app" layout="column" ng-controller="TasksController as vm" ng-cloak>
+
+    <md-toolbar layout="row" class="md-whiteframe-z1 md-toolbar-tools">
+        <md-button class="menu" hide-gt-sm ng-click="vm.toggleSidebar()" aria-label="Show Task List">
+            <md-icon md-svg-icon="menu"></md-icon>
+        </md-button>
+        <h1>My Todo List</h1>
+        <span flex></span>
+        <md-button class="md-button md-secondary" aria-label="Add Task" ng-click="vm.showForm($event)">
+            Add a new task
+        </md-button>
+    </md-toolbar>
+
+    <div flex layout="row">
+        <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="md-whiteframe-z2" md-component-id="left"
+                layout="column">
+            <md-tabs md-stretch-tabs="always">
+                <md-tab flex label="ALL" md-on-select="vm.filterTasks('all');"></md-tab>
+                <md-tab flex label="TODO" md-on-select="vm.filterTasks('todo');"></md-tab>
+                <md-tab flex label="DONE" md-on-select="vm.filterTasks('done')"></md-tab>
+            </md-tabs>
+            <md-divider></md-divider>
+            <div flex ng-show="!vm.tasks.length" class="watermark center">
+                <h2 class="md-subhead">No task found</h2>
+            </div>
+            <md-list flex>
+                <md-list-item class="task-list-item"
+                        ng-repeat="task in vm.tasks |
+                            orderBy:'createdAt':true track by $index"
+                        ng-class="{'active' : task._id === vm.selected._id,
+                                   'done' : task.done}"
+                        ng-click="vm.selectTask(task)">
+
+                    <div class="md-list-item-text">
+                        {{task.title}}
+                    </div>
+                    <span flex></span>
+                    <md-checkbox class="md-secondary"
+                        aria-label="Is task done ?"
+                        ng-model="task.done"
+                        ng-change="vm.save(task, true)">
+                        <md-tooltip md-direction="right">Is task done ?</md-tooltip>
+                    </md-checkbox>
+                </md-list-item>
+            </md-list>
+            <md-button ng-click="vm.confirm($event, vm.clearTasks)">Clear done tasks</md-button>
+        </md-sidenav>
+
+        <md-content flex id="content">
+            <div ng-show="!vm.selected._id">
+                <h2 class="md-display-1 watermark light">No task selected</h2>
+            </div>
+            <div ng-show="vm.selected._id" layout="column">
+                <div layout="row">
+                    <h1 class="md-headline">{{vm.selected.title}}</h1>
+                    <span flex></span>
+                     <md-switch class="md-secondary" md-no-ink aria-label="Set done"
+                            ng-model="vm.selected.done"
+                            ng-change="vm.save(vm.selected)">
+                        <span ng-show="!vm.selected.done" >TODO</span>
+                        <span ng-show="vm.selected.done" >DONE</span>
+                    </md-switch>
+                </div>
+                <p class="md-body-1" ng-bind-html="vm.selected.body | nl2br"></p>
+            </div>
+        </md-content>
+
+    </div>
+
+    <script src="app/vendors.min.js"></script>
+    <script src="app/app.min.js"></script>
+    <script src="app/templates.min.js"></script>
+
+</body>
+</html>
